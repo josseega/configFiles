@@ -1,0 +1,11 @@
+*
+
+!.gitignore
+!alacritty/
+!nvim/UltiSnips
+!nvim/init.vim
+!qtile/
+!qutebrowser/
+!ranger/
+!rofi/
+!zathura/
