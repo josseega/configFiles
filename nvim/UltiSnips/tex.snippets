@@ -1,0 +1,560 @@
+##########
+# GLOBAL #
+##########
+
+
+global !p
+
+def math():
+	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+def comment(): 
+	return vim.eval('vimtex#syntax#in_comment()') == '1'
+def env(name):
+	[x,y] = vim.eval("vimtex#env#is_inside('" + name + "')") 
+	return x != '0' and y != '0'
+
+def create_table(snip):
+	rows = snip.buffer[snip.line].split('x')[0]
+	cols = snip.buffer[snip.line].split('x')[1]
+	int_val = lambda string: int(''.join(s for s in string if s.isdigit()))
+	rows = int_val(rows)
+	cols = int_val(cols)
+	offset = cols + 1
+	old_spacing = snip.buffer[snip.line][:snip.buffer[snip.line].rfind('\t') + 1]
+	snip.buffer[snip.line] = ''
+	final_str = old_spacing + "\\begin{tabular}{|" + "|".join(['$' + str(i + 1) for i in range(cols)]) + "|}\n"
+	for i in range(rows):
+		final_str += old_spacing + '\t'
+		final_str += " & ".join(['$' + str(i * cols + j + offset) for j in range(cols)])
+		final_str += " \\\\\\\n"
+	final_str += old_spacing + "\\end{tabular}\n$0"
+	snip.expand_anon(final_str)
+
+def add_row(snip):
+	row_len = int(''.join(s for s in snip.buffer[snip.line] if s.isdigit()))
+	old_spacing = snip.buffer[snip.line][:snip.buffer[snip.line].rfind('\t') + 1]
+	snip.buffer[snip.line] = ''
+	final_str = old_spacing
+	final_str += " & ".join(['$' + str(j + 1) for j in range(row_len)])
+	final_str += " \\\\\\"
+	snip.expand_anon(final_str)
+endglobal
+
+
+
+###############
+# MINE!!!
+###############
+
+snippet defTheorems "Definition of Theorems env's" bw
+\newtheorem{lema}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+$0
+endsnippet
+
+snippet nin "no identation" biA
+\noindent $0
+endsnippet
+
+#snippet // "Fraction" iA
+#	\\frac{$1}{$2}$0
+#endsnippet
+
+
+snippet ita "\it{ $1 }" w
+\textit{$1} $0
+endsnippet
+
+snippet ie "\it{i.e.,}" w
+\textit{i.e.,} $0
+endsnippet
+	
+snippet eg "\it{e.g.,}" w
+\textit{e.g.,} $0
+endsnippet
+	
+snippet cf "(\it{cf.,} text)" w
+(\textit{c.f.,} $1)$0
+endsnippet
+
+
+context "comment()"
+snippet date "Date in comment" iA
+`date +%F`
+endsnippet
+
+snippet eqr "\eqref{ } " iA
+\eqref{eq:$1} $0
+endsnippet
+	
+
+
+###############
+# Theorems
+###############
+
+snippet thm "Theorem" bi
+\begin{theorem}	
+	$1
+\end{theorem}
+$0
+endsnippet
+
+snippet lema "Lemma" bi
+\begin{lema}	
+	$1
+\end{lema}
+$0
+endsnippet
+
+snippet remark "Remark" bi
+\begin{remark}	
+	$1
+\end{remark}
+$0
+endsnippet
+
+snippet definition "Definition" bi
+\begin{definition}	
+	$1
+\end{definition}
+$0
+endsnippet
+
+
+
+###############
+# COMMENT'S
+###############
+
+context "comment()"
+snippet todo "Todo task" iA
+	TODO: ( `date +%F` )
+% --> $1
+$0
+endsnippet
+
+
+
+###############
+# ENVIRONMENT #
+###############
+
+snippet beg "begin{} / end{}" bA
+\begin{$1}
+	${0:${VISUAL}}
+\end{$1}
+endsnippet
+
+#Figure environment
+
+snippet fig "Figure environment" bi
+\begin{figure}[${1:htpb}]
+	\centering
+	${2:\includegraphics[width=0.8\textwidth]{$3}}
+	\caption{${4:$3}}
+	\label{fig:${5:${3/\W+/-/g}}}
+\end{figure}
+endsnippet
+
+#Enumerate 
+
+snippet enum "Enumerate" bA
+\begin{enumerate}
+	\item ${0:${VISUAL}}
+\end{enumerate}
+endsnippet
+
+#Itemize
+
+snippet item "Itemize" bA
+\begin{itemize}
+	\item ${0:${VISUAL}}
+\end{itemize}
+endsnippet
+
+#Create a table
+
+snippet tab "tabular / array environment" b
+	\begin{${1:t}${1/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}{${2:c}}
+	$0${2/(?<=.)(c|l|r)|./(?1: & )/g}
+	\end{$1${1/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}
+endsnippet
+
+snippet table "Table environment" b
+\begin{table}[${1:htpb}]
+	\centering
+	\caption{${2:caption}}
+	\label{tab:${3:label}}
+
+	\begin{${4:t}${4/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}{${5:c}}
+		$0${5/(?<=.)(c|l|r)|./(?1: & )/g}
+	\end{$4${4/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}
+\end{table}
+endsnippet
+
+
+
+########
+# MATH #
+########
+
+
+context "math()"
+snippet ,, "\quad" iA
+\quad $0
+endsnippet
+	
+
+context "math()"
+snippet imp "\implies " iA
+\implies $0
+endsnippet
+
+# Labeled equation
+
+snippet eq "Labeled equation" biA
+\begin{equation}
+	\label{eq:$1}
+	$2
+\end{equation}
+
+$0
+endsnippet
+
+# Display Math
+
+snippet dm "Display Math" bwA
+\[
+	${1:${VISUAL}}
+.\]
+$0
+endsnippet
+
+# Inline Math
+
+snippet mk "Math" wA
+$${1}$`!p
+if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
+    snip.rv = ' '
+else:
+    snip.rv = ''
+`$2
+endsnippet
+
+context "math()"
+snippet RR "Real numbers" wA
+\mathbb{R}
+endsnippet
+
+
+## Auto sibscrpts for 1 or 2 digits
+
+context "math()"
+snippet '([A-Za-z])(\d)' "auto subscript" wrA
+`!p snip.rv = match.group(1)`_`!p snip.rv = match.group(2)`
+endsnippet
+
+context "math()"
+snippet '([A-Za-z])_(\d\d)' "auto subscript2" wrA
+`!p snip.rv = match.group(1)`_{`!p snip.rv = match.group(2)`}
+endsnippet
+
+
+#Superscripts
+
+context "math()"
+snippet ps "^2" i
+^2
+endsnippet
+
+context "math()"
+snippet pc "^3" iA
+^3
+endsnippet
+
+context "math()"
+snippet pp "superscript" iA
+^{$1}$0
+endsnippet
+
+# Fractions
+
+context "math()"
+snippet // "Fraction" wA
+\\frac{$1}{$2} $0
+endsnippet
+
+context "math()"
+snippet '((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/' "Fraction" wrA
+\\frac{`!p snip.rv = match.group(1)`}{$1}$0
+endsnippet
+
+########
+#  Sympy evaluations
+########
+
+snippet sympy "sympy block " w
+sympy $1 sympy$0
+endsnippet
+
+priority 10000
+snippet 'sympy(.*)sympy' "evaluate sympy" wr
+`!p
+from sympy import *
+x, y, z, t = symbols('x y z t')
+k, m, n = symbols('k m n', integer=True)
+f, g, h = symbols('f g h', cls=Function)
+init_printing()
+snip.rv = eval('latex(' + match.group(1).replace('\\', '') \
+    .replace('^', '**') \
+    .replace('{', '(') \
+    .replace('}', ')') + ')')
+`
+endsnippet
+
+
+########
+#  Postfixes
+########
+
+# dot
+
+context "math()"
+snippet "dot" "dot{}" riA
+\dot{$1}$0
+endsnippet
+
+# hat
+
+context "math()"
+snippet "hat" "hat{}" riA
+\hat{$1}$0
+endsnippet
+
+
+# bar
+
+context "math()"
+snippet "bar" "bar{}" riA
+\overline{$1}$0
+endsnippet
+
+snippet == "equals" iA
+&= $1 \\\\
+endsnippet
+
+snippet != "not equals" iA
+\neq 
+endsnippet
+
+context "math()"
+snippet ceil "ceil" iA
+\left\lceil $1 \right\rfloor $0
+endsnippet
+
+snippet pmat "pmat" iA
+\begin{pmatrix} $1 \end{pmatrix} $0
+endsnippet
+
+snippet bmat "bmat" iA
+\begin{bmatrix} $1 \end{bmatrix} $0
+endsnippet
+
+context "math()"
+snippet () "left( right)" i
+\left( ${1:${VISUAL}} \right) $0
+endsnippet
+
+context "math()"
+snippet || "left| right|" iA
+\left| ${1:${VISUAL}} \right| $0
+endsnippet
+
+context "math()"
+snippet lr{ "left\{ right\}" iA
+\left\\{ ${1:${VISUAL}} \right\\} $0
+endsnippet
+
+context "math()"
+snippet [] "left[ right]" iA
+\left[ ${1:${VISUAL}} \right] $0
+endsnippet
+
+context "math()"
+snippet part "d/dx" wA
+\frac{\partial ${1:V}}{\partial ${2:x}} $0
+endsnippet
+
+context "math()"
+snippet sq "\sqrt{}" iA
+\sqrt{${1:${VISUAL}}} $0
+endsnippet
+
+snippet __ "subscript" iA
+_{$1}$0
+endsnippet
+
+snippet ooo "\infty" iA
+\infty
+endsnippet
+
+snippet <= "leq" iA
+\leq 
+endsnippet
+
+snippet >= "geq" iA
+\geq 
+endsnippet
+
+context "math()"
+snippet EE "exists" iA
+\exists 
+endsnippet
+
+context "math()"
+snippet FA "forall" iA
+\forall 
+endsnippet
+
+snippet R+ "R^+" iA
+\mathbb{R}^+
+endsnippet
+
+context "math()"
+snippet mcal "mathcal" iA
+\mathcal{$1}$0
+endsnippet
+
+context "math()"
+snippet xx "cross" iA
+\times 
+endsnippet
+
+context "math()"
+snippet vert "norm" iA
+\vert $1 \vert$0
+endsnippet
+
+context "math()"
+snippet Vert "norm" iA
+\Vert $1 \Vert$0
+endsnippet
+
+priority 100
+context "math()"
+snippet '(?<!\\)(sin|cos|arccot|cot|csc|ln|log|exp|star|perp)' "ln" rwA
+\\`!p snip.rv = match.group(1)`
+endsnippet
+
+priority 300
+context "math()"
+snippet dint "integral" wA
+\int_{${1:-\infty}}^{${2:\infty}} ${3:${VISUAL}} $0
+endsnippet
+
+priority 200
+context "math()"
+snippet '(?<!\\)(arcsin|arccos|arctan|arccot|arccsc|arcsec|pi|zeta|int)' "ln" rwA
+\\`!p snip.rv = match.group(1)`
+endsnippet
+
+
+priority 100
+context "math()"
+snippet -> "to" iA
+\to 
+endsnippet
+
+priority 200
+context "math()"
+snippet <-> "leftrightarrow" iA
+\leftrightarrow
+endsnippet
+
+context "math()"
+snippet !> "mapsto" iA
+\mapsto 
+endsnippet
+
+context "math()"
+snippet invs "inverse" iA
+^{-1}
+endsnippet
+
+snippet >> ">>" iA
+\gg
+endsnippet
+
+snippet << "<<" iA
+\ll
+endsnippet
+
+snippet ~~ "~" iA
+\sim 
+endsnippet
+
+context "math()"
+snippet set "set" wA
+\\{$1\\} $0
+endsnippet
+
+context "math()"
+snippet cc "subset" Ai
+\subset 
+endsnippet
+
+snippet notin "not in " iA
+\not\in 
+endsnippet
+
+context "math()"
+snippet inn "in " iA
+\in 
+endsnippet
+
+snippet NN "n" iA
+\mathbb{N}
+endsnippet
+
+snippet OO "emptyset" iA
+\mathbb{O}
+endsnippet
+
+snippet QQ "Q" iA
+\mathbb{Q}
+endsnippet
+
+snippet ZZ "Z" iA
+\mathbb{Z}
+endsnippet
+
+context "math()"
+snippet tt "text" iA
+\text{$1}$0
+endsnippet
+
+
+snippet bigfun "Big function" iA
+\begin{align*}
+	$1: $2 &\longrightarrow $3 \\\\
+	$4 &\longmapsto $1($4) = $0
+.\end{align*}
+endsnippet
+
+snippet cvec "column vector" iA
+\begin{pmatrix} ${1:x}_${2:1}\\\\ \vdots\\\\ $1_${2:n} \end{pmatrix}
+endsnippet
+
+snippet HH "H" iA
+\mathbb{H}
+endsnippet
+
+snippet DD "D" iA
+\mathbb{D}
+endsnippet
+
+# vim:ft=snippets
+
