@@ -11,7 +11,6 @@ nvim/*
 !nvim/init.vim
 !nvim/UltiSnips
 
-!qtile
 !qutebrowser
 qutebrowser/solarized-everything-css
 !ranger

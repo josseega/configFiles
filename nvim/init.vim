@@ -54,15 +54,6 @@ Plug 'gko/vim-coloresque'
 " Track the engine.
 Plug 'SirVer/ultisnips'
 
-" Autocompletion deoplete
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-
 " Folding
 "
 Plug 'matze/vim-tex-fold'
@@ -216,15 +207,6 @@ let g:vimtex_compiler_latexmk_engines = {
 
 let g:vimtex_view_method = 'zathura'
 
-"****************************************************
-" DEoplete config
-"****************************************************
-
-let g:deoplete#enable_at_startup = 1
-
-call deoplete#custom#var('omni', 'input_patterns', {
-      \ 'tex': g:vimtex#re#deoplete
-      \})
 
 "****************************************************
 " UltiSnips Config
