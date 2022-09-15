@@ -1,11 +1,13 @@
 *
 
 !.gitignore
-!alacritty/
+!README.md
+!/alacritty/*
 !nvim/UltiSnips
 !nvim/init.vim
-!qtile/
-!qutebrowser/
-!ranger/
-!rofi/
-!zathura/
+nvim/*
+!qtile/*
+!qutebrowser/*
+!ranger/*
+!rofi/*
+!zathura/*
