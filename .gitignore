@@ -1,19 +1,1 @@
 
-/*
-
-!.git
-!.gitignore
-!README.md
-!alacritty
-
-!nvim/
-nvim/*
-!nvim/init.vim
-!nvim/UltiSnips
-
-!qutebrowser
-qutebrowser/solarized-everything-css
-!ranger
-!rofi
-!zathura
-
